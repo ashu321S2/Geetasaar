@@ -1,0 +1,188 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {% load static %}
+<!DOCTYPE html >
+<html>
+<head>
+<title>GeetaSaar: Ancient Wisdom for Solving Modern Problems.</title>
+<link rel="icon" href="{% static 'images/4524217.jpg'%}" type="{% static 'images/4524217.jpg' %}">
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="{% static 'about/templatemo_style.css' %}" rel="stylesheet" />
+</head>
+
+<body>
+<div id="templatemo_wrapper1">
+<div id="templatemo_wrapper2">
+
+	<div id="templatemo_container">
+    
+        <div id="templatemo_menu">
+     	    <ul>
+			<li><a href="/"  >Home</a></li>
+			<li><a href="/history/">History</a></li>
+            <li><a href="/Teachings/"class="current">Teachings</a></li>
+            <li><a href="/Images/">Images</a></li>    
+            <li><a href="/login/">Login</a></li>         
+            <li><a href="/Contact Us/" class="lastmenu">Contact Us</a></li>            
+            </ul>  
+        </div>
+    
+    <div id="templatemo_header_banner">
+    	<div id="templatemo_header">
+        	<div id="templatemo_sitetitle">
+            	GeetaSaar:</div>
+      <div id="templatemo_tagline">Ancient Wisdom for Solving Modern Problems.</div>
+        </div>
+        <div id="templatemo_banner">
+        	
+        </div>
+    </div>
+    
+    <div id="templatemo_content">
+    
+   		<!-- left column -->
+    	<div id="templatemo_leftcolumn">
+        	
+            
+            <div class="spacetobottom">
+                <img src="{% static 'images/ding.jpg'%}" alt=""/>
+            </div>
+            <br><br> <br> 
+            <h1 style="text-align: left;">Welcome to our website</h1> 
+            <div class="newssection">   
+               
+	                   	
+                <p>The project "GeetaSaar" integrates the timeless wisdom of the Bhagavad Gita into modern life. By translating these ancient teachings of Bhagavad Gita into practical solutions, it offers a holistic framework for personal growth, ethical decision-making, and spiritual evolution. This seamless blend of tradition and relevance helps individuals navigate life with clarity, purpose, and resilience.
+                    </p>
+                    
+            </div>
+            <br><br><br>
+			
+            <img src="{% static 'images/title.png'%}" alt="" />
+            <br>
+            <br>
+            <div class="twocolumn">
+	            <div class="twocolumn_box">
+                    <h1>Who We Are</h1>
+                    <p>
+                        <img src="{% static 'images/image(70x70).jpg'%}" alt="" />
+                   
+                  </p>
+                  <br><br><br><br><br>
+
+                    <ul>
+                        <li>Ashutosh Kumar</li>
+                        <li>Bhoomika Bankey</li>
+                        <li>Priyanka Dalai</li>                        
+                </ul>
+                   
+                </div>
+            </div>
+            
+        </div>
+        <!-- End of left column -->
+        
+        <!-- Right column -->
+        <div id="templatemo_rightcolumn"><br><br><br><br>
+        	<div class="container">
+    <h1>Bhagavad Gita Teaching's</h1>
+    
+    <form id="search-form">
+      <!-- Dropdown for selecting chapter -->
+      <label for="chapter-select"></label>
+      <select id="chapter-select">
+        <option value="">--Select Chapter--</option>
+        <!-- Options will be populated by JavaScript -->
+      </select>
+
+      <!-- Dropdown for selecting verse -->
+      <label for="verse-select"></label>
+      <select id="verse-select">
+        <option value="">--Select Verse--</option>
+        <!-- Options will be populated by JavaScript -->
+      </select>
+
+      <!-- Input field for keyword search -->
+      <label for="keyword-search"></label>
+      <input type="text" id="keyword-search" placeholder="Search by Keyword:">
+
+      <button type="submit">Search</button>
+    </form>
+    <div id="result-container"></div>
+    <br>
+    <br>
+  </div>
+  <script >       
+					   document.addEventListener('DOMContentLoaded', () => {
+  const $ = id => document.getElementById(id);
+  const [searchForm, chapterSelect, verseSelect, resultContainer, keywordInput] = 
+        ['search-form', 'chapter-select', 'verse-select', 'result-container', 'keyword-search'].map($);
+
+  let data;
+
+  fetch("{% static 'bhagavad-gita.json'%}")
+      .then(res => res.json())
+      .then(json => {
+          data = json;
+          chapterSelect.innerHTML += data.chapters.map(chap => 
+              `<option value="${chap.chapter_number}">Chapter ${chap.chapter_number} - ${chap.chapter_name}</option>`
+          ).join('');
+      })
+      .catch(err => console.error('Error loading JSON:', err));
+  chapterSelect.addEventListener('change', () => {
+      const chapter = data.chapters.find(chap => chap.chapter_number == chapterSelect.value);
+      verseSelect.innerHTML = '<option value="">--Select Verse--</option>' + 
+          (chapter ? chapter.verses.map(verse => 
+              `<option value="${verse.verse_number}">Verse ${verse.verse_number}</option>`).join('') : '');
+      toggleInputs();
+  });
+  searchForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const [chapterNum, verseNum, keyword] = [chapterSelect.value, verseSelect.value, keywordInput.value.trim().toLowerCase()];
+      if (keyword && !chapterNum && !verseNum) displayResult(searchByKeyword(keyword));
+      else if (chapterNum && verseNum && !keyword) displayResult(searchVerses(chapterNum, verseNum));
+      else resultContainer.innerHTML = '<p>Please either select a chapter and verse, or enter a keyword. Do not use both.</p>';
+  });
+  const searchVerses = (chapterNum, verseNum) => {
+      const chapter = data.chapters.find(chap => chap.chapter_number == chapterNum);
+      const verse = chapter?.verses.find(verse => verse.verse_number == verseNum);
+      return verse ? [{ chapter: chapter.chapter_name, ...verse }] : [];
+  };
+  const searchByKeyword = keyword => 
+      data.chapters.flatMap(chap => chap.verses.filter(verse => 
+          [verse.translation, verse.transliteration, verse.meaning].some(text => text.toLowerCase().includes(keyword)))
+          .map(verse => ({ chapter: chap.chapter_name, ...verse })));
+  const displayResult = verses => {
+      resultContainer.innerHTML = verses.length ? verses.map(verse => `
+          <div class="verse">
+              <h2>Chapter ${verse.chapter}</h2>
+              <p><strong>Verse ${verse.verse_number}:</strong> ${verse.sanskrit}</p>
+              <p><strong>Translation:</strong> ${verse.translation}</p>
+              <p><strong>Transliteration:</strong> ${verse.transliteration}</p>
+              <p><strong>Meaning:</strong> ${verse.meaning}</p>
+          </div>`).join('') : '<p>No verses found.</p>';
+  };
+
+  const toggleInputs = () => {
+      const [keyword, chapter, verse] = [keywordInput.value.trim(), chapterSelect.value, verseSelect.value];
+      chapterSelect.disabled = verseSelect.disabled = !!keyword;
+      keywordInput.disabled = !!chapter || !!verse;
+  };
+  keywordInput.addEventListener('input', toggleInputs);
+});
+</script>         
+           
+        </div>
+    </div>
+	
+     
+    
+    	<div id="templatemo_footer">
+     <br>	<a href="/">Home</a> | <a href="/history/">History</a> | <a href="/Teachings/">Teachings</a> | <a href="/Images/">Images</a> | <a href="/login/">Login</a> | <a href="/Contact Us/">Contact Us</a><br />
+        	Copyright &copy; 2048 <a href="#"><strong>Sage University</strong></a> | Design by Us.
+    	</div>
+        
+    </div>
+   
+
+</body>
+</html>
